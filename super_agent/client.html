@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice AI Super-Agent Tester</title>
+</head>
+<body>
+    <h1>Voice AI Super-Agent WebSocket Tester</h1>
+    <select id="botType">
+        <option value="lead_qualifier">Lead Qualifier</option>
+        <option value="personal_loan">Personal Loan</option>
+    </select>
+    <button id="connectBtn">Connect</button>
+    <br><br>
+    <input type="text" id="messageInput" placeholder="Type your message">
+    <button id="sendBtn">Send</button>
+    <br><br>
+    <div id="messages"></div>
+
+    <script>
+        let ws;
+        const connectBtn = document.getElementById('connectBtn');
+        const sendBtn = document.getElementById('sendBtn');
+        const messageInput = document.getElementById('messageInput');
+        const messagesDiv = document.getElementById('messages');
+        const botTypeSelect = document.getElementById('botType');
+
+        connectBtn.addEventListener('click', () => {
+            const botType = botTypeSelect.value;
+            ws = new WebSocket(`ws://localhost:8000/ws/${botType}`);
+            ws.onopen = () => {
+                messagesDiv.innerHTML += '<p>Connected</p>';
+                connectBtn.disabled = true;
+            };
+            ws.onmessage = (event) => {
+                messagesDiv.innerHTML += `<p>Bot: ${event.data}</p>`;
+            };
+            ws.onclose = () => {
+                messagesDiv.innerHTML += '<p>Disconnected</p>';
+                connectBtn.disabled = false;
+            };
+        });
+
+        sendBtn.addEventListener('click', () => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const message = messageInput.value;
+                ws.send(message);
+                messagesDiv.innerHTML += `<p>You: ${message}</p>`;
+                messageInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>

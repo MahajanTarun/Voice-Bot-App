@@ -1,0 +1,11 @@
+__pycache__
+.git
+.DS_Store
+
+
+.env
+agent_env/
+venv/
+env/
+*.pyc
+
